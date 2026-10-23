@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Faizi Uncensored AI — Free Chat</title>
+<meta name="description" content="Free AI chat powered by open-source models. No sign-up, your key stays in your browser.">
+<style>
+  :root{
+    --bg:#0b0714; --bg2:#120a24; --card:#180f30; --card2:#1f1440;
+    --line:#2c1d55; --txt:#f2eefc; --muted:#a99fd0; --acc:#7c3aed; --acc2:#a855f7;
+    --user:#2a1650; --danger:#f87171; --ok:#34d399;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:radial-gradient(1200px 600px at 80% -10%, #2a1650 0%, var(--bg) 55%); color:var(--txt); display:flex; flex-direction:column}
+  header{display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--line); background:rgba(11,7,20,.85); backdrop-filter:blur(8px); position:sticky; top:0; z-index:5}
+  .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--acc),#4c1d95);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;flex:none}
+  header h1{font-size:16px;margin:0;line-height:1.15}
+  header p{margin:0;font-size:11px;color:var(--muted)}
+  header .sp{flex:1}
+  .hbtn{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px;cursor:pointer}
+  .hbtn:active{transform:scale(.97)}
+  #modelBar{display:flex;gap:8px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--line);background:rgba(18,10,36,.7);font-size:12px;color:var(--muted);flex-wrap:wrap}
+  #modelBar select{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:12.5px;max-width:70vw}
+  .badge{font-size:10.5px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+  .badge.free{color:var(--ok);border-color:#14532d}
+  .badge.unc{color:#f0abfc;border-color:#701a75}
+  #chat{flex:1;overflow-y:auto;padding:16px 12px 8px;display:flex;flex-direction:column;gap:12px;max-width:860px;width:100%;margin:0 auto}
+  .msg{max-width:88%;padding:11px 14px;border-radius:16px;font-size:15px;line-height:1.55;white-space:pre-wrap;word-wrap:break-word;animation:up .18s ease}
+  @keyframes up{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .msg.user{align-self:flex-end;background:var(--user);border:1px solid #3b2273;border-bottom-right-radius:4px}
+  .msg.ai{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
+  .msg.ai code{background:#0d0722;border:1px solid var(--line);border-radius:6px;padding:1px 5px;font-size:13px}
+  .msg.ai pre{background:#0d0722;border:1px solid var(--line);border-radius:10px;padding:10px;overflow-x:auto;white-space:pre}
+  .msg.ai pre code{border:none;background:none;padding:0}
+  .msg.err{align-self:center;background:#2a0f16;border:1px solid #7f1d2d;color:#fecaca;font-size:13px;max-width:94%}
+  .who{font-size:10.5px;color:var(--muted);margin:0 4px -6px}
+  .who.r{text-align:right}
+  .empty{margin:auto;text-align:center;color:var(--muted);max-width:420px;padding:20px}
+  .empty h2{color:var(--txt);font-size:20px;margin:0 0 8px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+  .chip{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:99px;padding:8px 13px;font-size:13px;cursor:pointer}
+  .chip:active{transform:scale(.97)}
+  #composer{border-top:1px solid var(--line);background:rgba(11,7,20,.9);padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+  #composer .row{max-width:860px;margin:0 auto;display:flex;gap:8px;align-items:flex-end}
+  #input{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;color:var(--txt);font-size:15px;padding:12px 14px;resize:none;max-height:140px;min-height:48px;font-family:inherit}
+  #input:focus{outline:2px solid var(--acc);outline-offset:0}
+  #send{width:48px;height:48px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--acc),#5b21b6);color:#fff;font-size:19px;cursor:pointer;flex:none}
+  #send:disabled{opacity:.45}
+  #send.stop{background:#7f1d2d}
+  #hint{max-width:860px;margin:6px auto 0;font-size:11px;color:var(--muted);text-align:center}
+  /* settings drawer */
+  #drawer{position:fixed;inset:0;background:rgba(4,2,10,.66);display:none;z-index:20}
+  #drawer.open{display:block}
+  #panel{position:absolute;right:0;top:0;bottom:0;width:min(420px,94vw);background:var(--bg2);border-left:1px solid var(--line);padding:18px;overflow-y:auto}
+  #panel h2{margin:0 0 4px;font-size:17px}
+  #panel p.sub{margin:0 0 14px;color:var(--muted);font-size:12.5px;line-height:1.5}
+  label{display:block;font-size:12.5px;color:var(--muted);margin:14px 0 6px}
+  #panel input,#panel select,#panel textarea{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:10px 12px;font-size:14px;font-family:inherit}
+  #panel textarea{min-height:84px;resize:vertical}
+  .save{width:100%;margin-top:18px;background:linear-gradient(135deg,var(--acc),#5b21b6);color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:600;cursor:pointer}
+  .note{font-size:12px;color:var(--muted);line-height:1.55;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:14px}
+  .note b{color:var(--txt)}
+  .x{float:right;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">F</div>
+  <div>
+    <h1>Faizi Uncensored AI</h1>
+    <p>Open-source models • Free • No sign-up</p>
+  </div>
+  <div class="sp"></div>
+  <button class="hbtn" id="newChat">New chat</button>
+  <button class="hbtn" id="openSettings">⚙ Settings</button>
+</header>
+
+<div id="modelBar">
+  <span>Model:</span>
+  <select id="modelSel"></select>
+  <span class="badge" id="modelBadge"></span>
+</div>
+
+<main id="chat">
+  <div class="empty" id="empty">
+    <h2>Assalam-o-Alaikum 👋</h2>
+    <p>Ye open-source AI models ke saath free chat hai. Neeche se koi sawal likho, ya ek chip tap karo.</p>
+    <div class="chips">
+      <button class="chip">Ek chhoti si kahani sunao</button>
+      <button class="chip">Python mein hello world likho</button>
+      <button class="chip">Business idea do — online earning ka</button>
+      <button class="chip">Urdu ghazal ke 2 sher likho</button>
+    </div>
+  </div>
+</main>
+
+<div id="composer">
+  <div class="row">
+    <textarea id="input" rows="1" placeholder="Message likho... (Enter = send)"></textarea>
+    <button id="send" title="Send">➤</button>
+  </div>
+  <p id="hint">Default provider bilkul free hai — koi key nahi chahiye. Zyada models ke liye Settings dekho.</p>
+</div>
+
+<div id="drawer">
+  <div id="panel">
+    <button class="x" id="closeSettings">✕</button>
+    <h2>Settings</h2>
+    <p class="sub">API key sirf is browser ke local storage mein save hoti hai — kisi server par nahi jati.</p>
+
+    <label>Provider</label>
+    <select id="providerSel">
+      <option value="pollinations">Pollinations — FREE, no key (default)</option>
+      <option value="huggingface">Hugging Face (Qwen, Hermes, DeepSeek)</option>
+      <option value="openrouter">OpenRouter</option>
+      <option value="venice">Venice AI</option>
+      <option value="custom">Custom (OpenAI-compatible)</option>
+    </select>
+
+    <div id="customFields" style="display:none">
+      <label>Base URL</label>
+      <input id="baseUrl" placeholder="https://openrouter.ai/api/v1">
+    </div>
+
+    <label>API Key</label>
+    <input id="apiKey" type="password" placeholder="sk-or-..." autocomplete="off">
+
+    <label>System Prompt (AI ki personality)</label>
+    <textarea id="sysPrompt"></textarea>
+
+    <button class="save" id="saveSettings">Save</button>
+
+    <div class="note"><b>Pollinations:</b> bilkul free, koi key nahi — GPT-OSS 20B open-source model.<br><br>
+    <b>Hugging Face:</b> Qwen 3.8, Hermes 3 (direct, kam refusal), DeepSeek — in ke liye HF account mein inference credits chahiye (filhal free credits khatam hain, is liye default Pollinations hai).<br><br>
+    <b>OpenRouter / Venice:</b> apni key ho to yahan daal do — Dolphin jaisay asal uncensored models wahan milte hain (per-token bohat sastay, lekin balance chahiye).</div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const chatEl = $('#chat'), inputEl = $('#input'), sendBtn = $('#send');
+
+const PROVIDERS = {
+  pollinations:{ base:'https://text.pollinations.ai/openai', keyHint:'(koi key nahi chahiye)', noKey:true },
+  huggingface: { base:'https://router.huggingface.co/v1', keyHint:'hf_...' },
+  openrouter:  { base:'https://openrouter.ai/api/v1', keyHint:'sk-or-...' },
+  venice:      { base:'https://api.venice.ai/api/v1', keyHint:'Venice API key' },
+  custom:      { base:'', keyHint:'API key' }
+};
+// Built-in shared keys — filhal koi nahi (HF free credits khatam thay)
+const BUILTIN = {};
+
+// models per provider: [id, label, badge]
+const MODELS = {
+  pollinations: [
+    ['openai-fast','GPT-OSS 20B (open-source) — FREE, no key','free']
+  ],
+  huggingface: [
+    ['NousResearch/Hermes-3-Llama-3.1-70B','Hermes 3 70B — direct, kam refusal','unc'],
+    ['Qwen/Qwen3.8-27B','Qwen 3.8 27B',''],
+    ['deepseek-ai/DeepSeek-V3.2','DeepSeek V3.2',''],
+    ['meta-llama/Llama-3.3-70B-Instruct','Llama 3.3 70B',''],
+    ['Qwen/Qwen3.5-35B-A3B','Qwen 3.5 35B (fast)','']
+  ],
+  openrouter: [
+    ['nvidia/nemotron-3-super-120b-a12b:free','Nemotron 3 Super 120B — FREE','free'],
+    ['google/gemma-4-31b-it:free','Gemma 4 31B — FREE','free'],
+    ['google/gemma-4-26b-a4b-it:free','Gemma 4 26B (fast) — FREE','free'],
+    ['openrouter/free','Free Models Router — FREE','free'],
+    ['cognitivecomputations/dolphin-mistral-24b-venice-edition','Dolphin Mistral 24B — UNCENSORED','unc'],
+    ['deepseek/deepseek-chat','DeepSeek V3 (paid, cheap)',''],
+    ['openai/gpt-4o-mini','GPT-4o mini (paid)','']
+  ],
+  venice: [
+    ['venice-uncensored','Venice Uncensored (Dolphin)','unc'],
+    ['llama-3.3-70b','Llama 3.3 70B','']
+  ],
+  custom: []
+};
+const DEFAULT_SYS = 'You are a helpful, direct AI assistant. Answer honestly and completely, in the same language the user writes in (Urdu, Roman Urdu or English). Do not add unnecessary warnings or moral lectures.';
+
+let cfg = JSON.parse(localStorage.getItem('faizi-ai-cfg') || '{}');
+cfg.provider = cfg.provider || 'pollinations';
+if(!MODELS[cfg.provider] || !MODELS[cfg.provider].some(m=>m[0]===cfg.model)) cfg.model = (MODELS[cfg.provider]||[])[0]?.[0] || '';
+cfg.sys = cfg.sys || DEFAULT_SYS;
+
+let messages = JSON.parse(localStorage.getItem('faizi-ai-chat') || '[]');
+let aborter = null;
+
+function baseUrl(){
+  if(cfg.provider==='custom') return (cfg.baseUrl||'').replace(/\/$/,'');
+  return PROVIDERS[cfg.provider].base;
+}
+function modelList(){ return MODELS[cfg.provider] || []; }
+function renderModels(){
+  const sel = $('#modelSel'); sel.innerHTML='';
+  modelList().forEach(([id,label])=>{ const o=document.createElement('option'); o.value=id; o.textContent=label; sel.appendChild(o); });
+  const custom=document.createElement('option'); custom.value='__custom'; custom.textContent='Custom model ID…'; sel.appendChild(custom);
+  sel.value = modelList().some(m=>m[0]===cfg.model) ? cfg.model : '__custom';
+  updateBadge();
+}
+function updateBadge(){
+  const m = modelList().find(x=>x[0]===$('#modelSel').value);
+  const b = $('#modelBadge');
+  if(m && m[2]==='free'){ b.textContent='FREE'; b.className='badge free'; }
+  else if(m && m[2]==='unc'){ b.textContent='LOW-REFUSAL'; b.className='badge unc'; }
+  else { b.textContent=''; b.className='badge'; }
+}
+$('#modelSel').addEventListener('change', e=>{
+  if(e.target.value==='__custom'){
+    const id = prompt('Model ID likho (e.g. cognitivecomputations/dolphin-mistral-24b-venice-edition)');
+    if(id){ cfg.model=id.trim(); if(!modelList().some(m=>m[0]===cfg.model)){ modelList().push([cfg.model,cfg.model,'']); } renderModels(); $('#modelSel').value=cfg.model; }
+    else { $('#modelSel').value=cfg.model; }
+  } else cfg.model = e.target.value;
+  saveCfg(); updateBadge();
+});
+function saveCfg(){ localStorage.setItem('faizi-ai-cfg', JSON.stringify(cfg)); }
+function saveChat(){ localStorage.setItem('faizi-ai-chat', JSON.stringify(messages.slice(-60))); }
+
+function md(t){
+  t = t.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  t = t.replace(/```(\w*)\n([\s\S]*?)```/g,(m,l,c)=>'<pre><code>'+c.replace(/^\n+|\n+$/g,'')+'</code></pre>');
+  t = t.replace(/`([^`\n]+)`/g,'<code>$1</code>');
+  t = t.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');
+  return t;
+}
+function addMsg(role, text){
+  $('#empty')?.remove();
+  const who=document.createElement('div'); who.className='who'+(role==='user'?' r':''); who.textContent = role==='user' ? 'You' : 'AI';
+  const d=document.createElement('div'); d.className='msg '+(role==='user'?'user':'ai');
+  if(role==='ai') d.innerHTML = md(text); else d.textContent = text;
+  chatEl.appendChild(who); chatEl.appendChild(d);
+  chatEl.scrollTop = chatEl.scrollHeight;
+  return d;
+}
+function addErr(text){
+  const d=document.createElement('div'); d.className='msg err'; d.textContent=text; chatEl.appendChild(d); chatEl.scrollTop=chatEl.scrollHeight;
+}
+function replay(){
+  chatEl.querySelectorAll('.msg,.who').forEach(n=>n.remove());
+  if(!messages.length){ location.reload(); return; }
+  $('#empty')?.remove();
+  messages.forEach(m=>addMsg(m.role, m.content));
+}
+
+function activeKey(){
+  if(PROVIDERS[cfg.provider].noKey) return '';
+  return ((cfg.keys||{})[cfg.provider] || BUILTIN[cfg.provider] || '').trim();
+}
+async function send(){
+  const text = inputEl.value.trim();
+  if(!text) return;
+  if(aborter){ aborter.abort(); return; }
+  const key = activeKey();
+  if(!PROVIDERS[cfg.provider].noKey && !key){
+    addErr('Is provider ke liye pehle Settings (⚙) mein API key daalo.');
+    openDrawer(); return;
+  }
+  inputEl.value=''; inputEl.style.height='auto';
+  messages.push({role:'user', content:text}); addMsg('user', text); saveChat();
+  const bubble = addMsg('ai','…');
+  sendBtn.textContent='■'; sendBtn.classList.add('stop');
+  aborter = new AbortController();
+  let full='';
+  try{
+    const res = await fetch(baseUrl()+'/chat/completions', {
+      method:'POST', signal:aborter.signal,
+      headers:{ 'Content-Type':'application/json', ...(key ? {'Authorization':'Bearer '+key} : {}), 'HTTP-Referer':location.origin, 'X-Title':'Faizi Uncensored AI' },
+      body: JSON.stringify({ model:cfg.model, stream:true, messages:[{role:'system',content:cfg.sys}, ...messages] })
+    });
+    if(!res.ok){
+      const e = await res.text();
+      throw new Error('HTTP '+res.status+' — '+e.slice(0,220));
+    }
+    const reader = res.body.getReader(); const dec = new TextDecoder(); let buf='';
+    while(true){
+      const {done, value} = await reader.read(); if(done) break;
+      buf += dec.decode(value, {stream:true});
+      const lines = buf.split('\n'); buf = lines.pop();
+      for(const ln of lines){
+        const s = ln.trim(); if(!s.startsWith('data:')) continue;
+        const data = s.slice(5).trim(); if(data==='[DONE]') continue;
+        try{ const j = JSON.parse(data); const delta = j.choices?.[0]?.delta?.content || ''; if(delta){ full += delta; bubble.innerHTML = md(full); chatEl.scrollTop = chatEl.scrollHeight; } }catch(_){}
+      }
+    }
+    if(!full) bubble.textContent = '(khaali jawab aya — model busy ho sakta hai, dobara try karo)';
+    messages.push({role:'assistant', content:full}); saveChat();
+  }catch(err){
+    if(err.name==='AbortError'){ bubble.innerHTML = md(full + '\n\n— roka gaya —'); messages.push({role:'assistant', content:full}); saveChat(); }
+    else { bubble.remove(); addErr('Error: '+err.message+'\n\nCheck: key sahi hai? Model free hai ya balance chahiye? Internet theek hai?'); }
+  }finally{
+    aborter=null; sendBtn.textContent='➤'; sendBtn.classList.remove('stop');
+  }
+}
+sendBtn.addEventListener('click', send);
+inputEl.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); } });
+inputEl.addEventListener('input', ()=>{ inputEl.style.height='auto'; inputEl.style.height=Math.min(inputEl.scrollHeight,140)+'px'; });
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click', ()=>{ inputEl.value=c.textContent; send(); }));
+$('#newChat').addEventListener('click', ()=>{ messages=[]; saveChat(); replay(); });
+
+/* settings */
+const drawer = $('#drawer');
+function openDrawer(){
+  $('#providerSel').value = cfg.provider;
+  $('#apiKey').value = (cfg.keys||{})[cfg.provider] || '';
+  $('#apiKey').placeholder = PROVIDERS[cfg.provider].keyHint;
+  $('#baseUrl').value = cfg.baseUrl || '';
+  $('#sysPrompt').value = cfg.sys || DEFAULT_SYS;
+  $('#customFields').style.display = cfg.provider==='custom' ? 'block':'none';
+  drawer.classList.add('open');
+}
+$('#openSettings').addEventListener('click', openDrawer);
+$('#closeSettings').addEventListener('click', ()=>drawer.classList.remove('open'));
+drawer.addEventListener('click', e=>{ if(e.target===drawer) drawer.classList.remove('open'); });
+$('#providerSel').addEventListener('change', e=>{
+  $('#customFields').style.display = e.target.value==='custom' ? 'block':'none';
+  $('#apiKey').value = (cfg.keys||{})[e.target.value] || '';
+  $('#apiKey').placeholder = PROVIDERS[e.target.value].keyHint;
+});
+$('#saveSettings').addEventListener('click', ()=>{
+  const newProvider = $('#providerSel').value;
+  cfg.provider = newProvider;
+  cfg.keys = cfg.keys || {};
+  cfg.keys[newProvider] = $('#apiKey').value.trim();
+  cfg.baseUrl = $('#baseUrl').value.trim();
+  cfg.sys = $('#sysPrompt').value.trim() || DEFAULT_SYS;
+  if(!modelList().some(m=>m[0]===cfg.model)) cfg.model = (modelList()[0]||[''])[0];
+  saveCfg(); renderModels(); drawer.classList.remove('open');
+  $('#hint').textContent = 'Settings save ho gayi ✓ Ab message bhejo.';
+});
+
+renderModels();
+if(messages.length) replay();
+</script>
+</body>
+</html>
